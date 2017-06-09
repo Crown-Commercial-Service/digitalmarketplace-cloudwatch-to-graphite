@@ -1,0 +1,29 @@
+{% set apps = ["api", "buyer-frontend", "supplier-frontend", "briefs-frontend", "search-api", "nginx"] -%}
+{% set environments = ["preview", "staging", "production"] -%}
+Auth:
+  region: "eu-west-1"
+Metrics:
+{% for environment in environments -%}
+{% for app in apps -%}
+{% for bucket in range(10) -%}
+- Namespace: "DM-RequestTimeBuckets"
+  MetricName: "{{ environment }}-{{ app }}-request-times-{{ bucket }}"
+  Statistics: "SampleCount"
+  Dimensions: []
+  Options:
+    Formatter: 'cloudwatch.request_time_buckets.{{ environment }}.{{ app }}.request_time_bucket_{{ bucket }}.%(statistic)s'
+{% endfor -%}
+{% endfor -%}
+{% endfor -%}
+{% for environment in environments -%}
+{% for app in apps -%}
+- Namespace: "DM-500s"
+  MetricName: "{{ environment }}-{{ app }}-500s"
+  Statistics: "SampleCount"
+  Dimensions: []
+  Options:
+    Formatter: 'cloudwatch.application_500s.{{ environment }}.{{ app }}.500s.%(statistic)s'
+{% endfor -%}
+{% endfor -%}
+Options:
+  Count: 10

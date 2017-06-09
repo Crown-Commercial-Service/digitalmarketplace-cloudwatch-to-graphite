@@ -1,0 +1,24 @@
+---
+applications:
+  - name: digitalmarketplace-cloudwatch-to-graphite-production-staging
+    buildpack: python_buildpack
+    no-route: true
+    health-check-type: none
+    command: python app.py
+    instances: 1
+    memory: 128M
+    env:
+      HOSTED_GRAPHITE_API_KEY: hosted_graphite_api_key
+      AWS_ACCESS_KEY_ID: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY: aws_secret_access_key
+  - name: digitalmarketplace-cloudwatch-to-graphite-preview
+    buildpack: python_buildpack
+    no-route: true
+    health-check-type: none
+    command: python app.py
+    instances: 1
+    memory: 128M
+    env:
+      HOSTED_GRAPHITE_API_KEY: hosted_graphite_api_key
+      AWS_ACCESS_KEY_ID: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY: aws_secret_access_key
