@@ -18,7 +18,7 @@ Metrics:
 {% for environment in environments -%}
 {% for app in apps -%}
 - Namespace: "DM-500s"
-  MetricName: "{{ environment }}-{{ app }}-500s"
+  MetricName: "{{ environment }}{% if app != "nginx" %}-{{ app }}{% endif %}-nginx-500s"
   Statistics: "SampleCount"
   Dimensions: []
   Options:
