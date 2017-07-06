@@ -22,7 +22,7 @@ def send_to_hostedgraphite(metrics):
     )
 
     if response.status_code >= 400:
-        print response.status_code, ": Error sending metrics to hosted graphite"
+        print(response.status_code, ": Error sending metrics to hosted graphite")
 
 
 def initialize_metrics():
