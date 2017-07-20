@@ -37,32 +37,10 @@ def initialize_metrics():
     send_to_hostedgraphite("\n".join(initialized_metrics))
 
 
-def group_by_metric_name(metrics_list):
-    metrics_dict = {}
-    keys = set([x.split()[0] for x in metrics_list])
-    for key in keys:
-        items = list(filter(lambda x: x.split()[0] == key, metrics_list))
-        metrics_dict[key] = items
-
-    return metrics_dict
-
-
-def drop_latest_timestamp(metrics):
-    metrics_list = metrics.splitlines()[:-1]
-    metrics_dict = group_by_metric_name(metrics_list)
-    final_string = ''
-    for key, metrics in metrics_dict.items():
-        metrics_sorted = sorted(metrics, key=lambda x: int(x.split()[-1]))
-        metrics_sorted.pop(-1)
-        final_string += "\n".join(metrics_sorted) + "\n"
-    return final_string
-
-
 @retry(wait_fixed=60000, retry_on_result=lambda res: res is None)
 def call_leadbutt():
     result = subprocess.Popen("leadbutt", stdout=subprocess.PIPE)
     metrics = result.communicate()[0].decode("utf-8")
-    metrics = drop_latest_timestamp(metrics)
     send_to_hostedgraphite(metrics)
 
 
