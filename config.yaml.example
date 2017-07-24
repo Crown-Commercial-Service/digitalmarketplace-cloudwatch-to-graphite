@@ -1,0 +1,32 @@
+# Sample config.yaml
+
+# If connecting to a different region other than default, set region
+Auth:
+  region: "us-west-2"
+Metrics:
+- Namespace: "AWS/ELB"
+  MetricName: "RequestCount"
+  Statistics: "Sum"
+  Unit: "Count"
+  Dimensions:
+    # You can have multiple dimensions, but boto will only return the last one
+    LoadBalancerName: "my-load-balancer"
+# You can list additional metrics in one file. Just be careful about rate limits.
+- Namespace: "AWS/EC2"
+  MetricName: "CPUUtilization"
+  # You can have multiple statistics too
+  Statistics:
+  - "Maximum"
+  - "Average"
+  Unit: "Percent"
+  Dimensions:
+    InstanceId: "i-r0b0t"
+  # OPTIONAL: custom options just for this metric
+  Options:
+    # Set this to customize your Graphite metric names
+    Formatter: 'cloudwatch.%(Namespace)s.%(dimension)s.%(MetricName)s.%(statistic)s.%(Unit)s'
+    # EC2 defaults to 5 minute reports
+    Period: 5
+# OPTIONAL: set defaults for all metrics in this file
+Options:
+  Count: 10

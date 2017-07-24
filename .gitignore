@@ -1,0 +1,5 @@
+venv*
+.cache
+.envrc
+manifest.yml
+config.yaml
