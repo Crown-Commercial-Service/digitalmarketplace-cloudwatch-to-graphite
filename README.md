@@ -22,7 +22,7 @@ pip install -r requirements.txt
 The `config.yaml` file defines what metrics are to be shipped to graphite. It is generated from the `config.yaml.j2` Jinja template using:
 
 ```
-plumbum config.yaml.j2 ec2 > config.yaml
+AWS_PROFILE='<profile name for dev infrastructure>' aws-auth plumbum config.yaml.j2 ec2 > config.yaml
 ```
 
 ## To run locally
