@@ -25,5 +25,13 @@ Metrics:
     Formatter: 'cloudwatch.application_500s.{{ environment }}.{{ app }}.500s.%(statistic)s'
 {% endfor -%}
 {% endfor -%}
+{% for environment in environments -%}
+- Namespace: "DM-429s"
+  MetricName: "{{ environment }}-router-nginx-429s"
+  Statistics: "Sum"
+  Dimensions: []
+  Options:
+    Formatter: "cloudwatch.router_429s.{{ environment }}.router.429s.%(statistic)s"
+{% endfor -%}
 Options:
   Count: 10
