@@ -31,9 +31,11 @@ def initialize_metrics():
     with open('config.yaml') as fp:
         config = yaml.load(fp)
         for metric in config['Metrics']:
-            metric_name = (metric['Options']['Formatter']
-                           .replace("%(statistic)s", metric['Statistics'].lower()))
-            initialized_metrics.append("{} 0.0 {}".format(metric_name, timestamp))
+            stats = metric['Statistics'] if isinstance(metric['Statistics'], list) else [metric['Statistics']]
+            for stat in stats:
+                metric_name = (metric['Options']['Formatter']
+                               .replace("%(statistic)s", stat.lower()))
+                initialized_metrics.append("{} 0.0 {}".format(metric_name, timestamp))
     send_to_hostedgraphite("\n".join(initialized_metrics))
 
 
