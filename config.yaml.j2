@@ -17,12 +17,14 @@ Metrics:
 {% endfor -%}
 {% for environment in environments -%}
 {% for app in apps -%}
-- Namespace: "DM-500s"
-  MetricName: "{{ environment }}{% if app != "nginx" %}-{{ app }}{% endif %}-nginx-500s"
+{% for status_prefix in ['4', '5'] %}
+- Namespace: "DM-{{ status_prefix }}00s"
+  MetricName: "{{ environment }}{% if app != "nginx" %}-{{ app }}{% endif %}-nginx-{{ status_prefix }}00s"
   Statistics: "Sum"
   Dimensions: []
   Options:
-    Formatter: 'cloudwatch.application_500s.{{ environment }}.{{ app }}.500s.%(statistic)s'
+    Formatter: 'cloudwatch.application_{{ status_prefix }}00s.{{ environment }}.{{ app }}.{{ status_prefix }}00s.%(statistic)s'
+{% endfor -%}
 {% endfor -%}
 {% endfor -%}
 {% for environment in environments -%}
