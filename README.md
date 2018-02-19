@@ -14,7 +14,7 @@ An example config file is also included (`config.yaml.example`) to help you defi
 ```
 virtualenv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
 
 #### Generate config.yaml
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 The `config.yaml` file defines what metrics are to be shipped to graphite. It is generated from the `config.yaml.j2` Jinja template using:
 
 ```
-AWS_PROFILE='<profile name for dev infrastructure>' aws-auth plumbum config.yaml.j2 ec2 > config.yaml
+scripts/generate-config-yaml.py
 ```
 
 ## To run locally
