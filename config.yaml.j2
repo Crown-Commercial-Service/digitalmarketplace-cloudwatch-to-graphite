@@ -1,5 +1,6 @@
 {% set apps = ["api", "admin-frontend", "briefs-frontend", "brief-responses-frontend", "buyer-frontend", "router", "search-api", "supplier-frontend", "user-frontend"] -%}
 {% set environments = ["preview", "staging", "production"] -%}
+{% set log_types = ["application", "nginx"] -%}
 Auth:
   region: "eu-west-1"
 Metrics:
@@ -32,6 +33,19 @@ Metrics:
   Dimensions: []
   Options:
     Formatter: "cloudwatch.router_429s.{{ environment }}.router.429s.%(statistic)s"
+{% endfor -%}
+{% for environment in environments -%}
+{% for app in apps -%}
+{% for log_type in log_types -%}
+- Namespace: "AWS/Logs"
+  MetricName: "IncomingLogEvents"
+  Statistics: "Sum"
+  Dimensions:
+    LogGroupName: "{{ environment }}-{{ app }}-{{ log_type }}"
+  Options:
+    Formatter: "cloudwatch.incoming_log_events.{{ environment }}.{{ app }}.{{ log_type }}_logs.%(statistic)s"
+{% endfor -%}
+{% endfor -%}
 {% endfor -%}
 Options:
   Count: 10
