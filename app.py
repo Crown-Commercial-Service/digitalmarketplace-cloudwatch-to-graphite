@@ -41,6 +41,9 @@ def initialize_metrics():
 
 @retry(wait_fixed=60000, retry_on_result=lambda res: res is None)
 def call_leadbutt():
+    """
+    See https://github.com/crccheck/cloudwatch-to-graphite for more info on leadbutt
+    """
     result = subprocess.Popen("leadbutt", stdout=subprocess.PIPE)
     metrics = result.communicate()[0].decode("utf-8")
     send_to_hostedgraphite(metrics)
