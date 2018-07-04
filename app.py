@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 import os
 import subprocess
+import logging
 from datetime import datetime, timedelta
 
 import requests
 import yaml
 from retrying import retry
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s — %(levelname)s — %(message)s",
+)
 
 
 def get_timestamp():
@@ -22,7 +28,9 @@ def send_to_hostedgraphite(metrics):
     )
 
     if response.status_code >= 400:
-        print(response.status_code, ": Error sending metrics to hosted graphite")
+        logging.warn(f"Error sending metrics to hosted graphite - Status code {response.status_code}")
+    else:
+        logging.info(f"Metrics sent to hosted graphite - Status code {response.status_code}")
 
 
 def initialize_metrics():
