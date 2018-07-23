@@ -24,6 +24,12 @@ Metrics:
   Dimensions: []
   Options:
     Formatter: 'cloudwatch.application_500s.{{ environment }}.{{ app }}.500s.%(statistic)s'
+- Namespace: "DM-APIClient-Retries"
+  MetricName: "{{ environment }}-{{ app }}-apiclient-retries"
+  Statistics: "Sum"
+  Dimensions: []
+  Options:
+    Formatter: "cloudwatch.apiclient_retries.{{ environment }}.{{ app }}.retries.%(statistic)s"
 {% endfor -%}
 {% endfor -%}
 {% for environment in environments -%}
