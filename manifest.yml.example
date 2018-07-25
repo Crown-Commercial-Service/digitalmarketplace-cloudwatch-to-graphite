@@ -4,7 +4,7 @@ applications:
     buildpack: python_buildpack
     no-route: true
     health-check-type: none
-    command: python app.py
+    command: python app.py 2>&1 | python pipe-watchdog.py
     instances: 1
     memory: 128M
     env:
@@ -15,7 +15,7 @@ applications:
     buildpack: python_buildpack
     no-route: true
     health-check-type: none
-    command: python app.py
+    command: python app.py 2>&1 | python pipe-watchdog.py
     instances: 1
     memory: 128M
     env:
