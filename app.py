@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import signal
 import subprocess
 import logging
 from datetime import datetime, timedelta
@@ -8,10 +9,8 @@ import requests
 import yaml
 from retrying import retry
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s — %(levelname)s — %(message)s",
-)
+
+logger = logging.getLogger("app")
 
 
 def get_timestamp():
@@ -28,9 +27,9 @@ def send_to_hostedgraphite(metrics):
     )
 
     if response.status_code >= 400:
-        logging.warn(f"Error sending metrics to hosted graphite - Status code {response.status_code}")
+        logger.warn(f"Error sending metrics to hosted graphite - Status code {response.status_code}")
     else:
-        logging.info(f"Metrics sent to hosted graphite - Status code {response.status_code}")
+        logger.info(f"Metrics sent to hosted graphite - Status code {response.status_code}")
 
 
 def initialize_metrics():
@@ -58,5 +57,14 @@ def call_leadbutt():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s:%(name)s:%(levelname)s:%(message)s",
+    )
+
+    # python by default installs a signal handler that largely ignores SIGPIPE, but we want to use it for our watchdog
+    # mechanism, so reinstate the *unix* default, which is a fatal handler
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
     initialize_metrics()
     call_leadbutt()
