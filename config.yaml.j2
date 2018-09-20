@@ -1,8 +1,6 @@
 {% set apps = ["antivirus-api", "api", "admin-frontend", "briefs-frontend", "brief-responses-frontend", "buyer-frontend", "router", "search-api", "supplier-frontend", "user-frontend"] -%}
 {% set environments = ["preview", "staging", "production"] -%}
 {% set log_types = ["application", "nginx"] -%}
-Auth:
-  region: "eu-west-1"
 Metrics:
 {% for environment in environments -%}
 {% for app in apps -%}
@@ -10,7 +8,7 @@ Metrics:
 - Namespace: "DM-RequestTimeBuckets"
   MetricName: "{{ environment }}-{{ app }}-request-times-{{ bucket }}"
   Statistics: "Sum"
-  Dimensions: []
+  Dimensions: {}
   Options:
     Formatter: 'cloudwatch.request_time_buckets.{{ environment }}.{{ app }}.request_time_bucket_{{ bucket }}.%(statistic)s'
 {% endfor -%}
@@ -21,13 +19,13 @@ Metrics:
 - Namespace: "DM-500s"
   MetricName: "{{ environment }}{% if app != "nginx" %}-{{ app }}{% endif %}-nginx-500s"
   Statistics: "Sum"
-  Dimensions: []
+  Dimensions: {}
   Options:
     Formatter: 'cloudwatch.application_500s.{{ environment }}.{{ app }}.500s.%(statistic)s'
 - Namespace: "DM-APIClient-Retries"
   MetricName: "{{ environment }}-{{ app }}-apiclient-retries"
   Statistics: "Sum"
-  Dimensions: []
+  Dimensions: {}
   Options:
     Formatter: "cloudwatch.apiclient_retries.{{ environment }}.{{ app }}.retries.%(statistic)s"
 {% endfor -%}
@@ -36,7 +34,7 @@ Metrics:
 - Namespace: "DM-429s"
   MetricName: "{{ environment }}-router-nginx-429s"
   Statistics: "Sum"
-  Dimensions: []
+  Dimensions: {}
   Options:
     Formatter: "cloudwatch.router_429s.{{ environment }}.router.429s.%(statistic)s"
 {% endfor -%}
@@ -53,5 +51,3 @@ Metrics:
 {% endfor -%}
 {% endfor -%}
 {% endfor -%}
-Options:
-  Count: 10
