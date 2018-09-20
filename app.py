@@ -3,11 +3,11 @@ import logging
 import os
 import sys
 
-from datetime import datetime, timedelta
 import boto3
 import requests
 import yaml
-from retrying import retry
+from datetime import datetime, timedelta
+from tenacity import retry, wait_fixed, retry_if_result
 
 
 logger = logging.getLogger("app")
@@ -48,7 +48,7 @@ def format_config_metric_entry_for_hostedgraphite_base_metric(config_metric_entr
 def create_hostedgraphite_base_metrics(config):
     """Take a metric entry from the config format it into a base metric used to initialise the metric on hostedgraphite.
     """
-    base_metrics = []
+    hostedgraphite_base_metrics = []
     timestamp = int(((datetime.now() - timedelta(days=5)) - datetime(1970, 1, 1)).total_seconds())
     for config_metric_entry in config['Metrics']:
         hostedgraphite_base_metric = format_config_metric_entry_for_hostedgraphite_base_metric(
@@ -59,7 +59,7 @@ def create_hostedgraphite_base_metrics(config):
     return hostedgraphite_base_metrics
 
 
-def format_cloudwatch_metric_datapoint_for_hostedgraphite(metric, result):
+def format_cloudwatch_metric_datapoint_for_hostedgraphite(cloudwatch_metric_datapoint, result):
     """Given a cloudwatch metric datapoint convert it into the format hostedgraphite expects."""
     hostedgraphite_metric_name = (
         cloudwatch_metric_datapoint['Options']['Formatter'] % {'statistic': cloudwatch_metric_datapoint['Statistics']}
@@ -71,7 +71,7 @@ def format_cloudwatch_metric_datapoint_for_hostedgraphite(metric, result):
     )
 
 
-def get_metric_from_cloudwatch(client, metric):
+def get_metric_from_cloudwatch(client, config_metric_entry):
     """Call the client once for th supplied metric."""
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(seconds=600)
@@ -79,11 +79,11 @@ def get_metric_from_cloudwatch(client, metric):
         Period=60,
         StartTime=start_time,
         EndTime=end_time,
-        MetricName=metric['MetricName'],
-        Namespace=metric['Namespace'],
-        Statistics=[metric['Statistics']],
-        Dimensions=[{'Name': k, 'Value': v} for k, v in metric['Dimensions'].items()],
-        Unit=metric.get('Unit', 'None'),
+        MetricName=config_metric_entry['MetricName'],
+        Namespace=config_metric_entry['Namespace'],
+        Statistics=[config_metric_entry['Statistics']],
+        Dimensions=[{'Name': k, 'Value': v} for k, v in config_metric_entry['Dimensions'].items()],
+        Unit=config_metric_entry.get('Unit', 'None'),
     )
 
 
@@ -97,11 +97,11 @@ def get_metrics_from_cloudwatch_and_format_for_hostedgraphite(config):
     hostedgraphite_metrics = []
 
     client = boto3.client('cloudwatch', region_name="eu-west-1")
-    for metric_entry in config['Metrics']:
-        cloudwatch_metric = get_metric_from_cloudwatch(client, metric_entry)
+    for config_metric_entry in config['Metrics']:
+        cloudwatch_metric = get_metric_from_cloudwatch(client, config_metric_entry)
         for cloudwatch_metric_datapoint in cloudwatch_metric['Datapoints']:
             hostedgraphite_metric = format_cloudwatch_metric_datapoint_for_hostedgraphite(
-                metric_entry,
+                config_metric_entry,
                 cloudwatch_metric_datapoint
             )
             hostedgraphite_metrics.append(hostedgraphite_metric)
@@ -113,10 +113,10 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(name)s:%(levelname)s:%(message)s", stream=sys.stdout)
     config = get_config()
 
-    base_metrics = create_hostedgraphite_base_metrics(config)
-    send_to_hostedgraphite("\n".join(base_metrics))
+    hostedgraphite_base_metrics = create_hostedgraphite_base_metrics(config)
+    send_to_hostedgraphite("\n".join(hostedgraphite_base_metrics))
 
-    @retry(wait_fixed=60000, retry_on_result=lambda res: res is None)
+    @retry(wait=wait_fixed(60), retry=retry_if_result(lambda res: res is None))
     def sleep_and_send_retry():
         """Wrapper to apply retry to get and send methods."""
         hostedgraphite_metrics = get_metrics_from_cloudwatch_and_format_for_hostedgraphite(config)
