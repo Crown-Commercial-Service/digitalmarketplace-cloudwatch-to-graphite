@@ -5,10 +5,6 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 virtualenv:
 	[ -z $$VIRTUAL_ENV ] && [ ! -d venv ] && python3 -m venv venv || true
 
-.PHONY: test-flake8
-test-flake8: virtualenv
-	${VIRTUALENV_ROOT}/bin/flake8 .
-
 .PHONY: freeze-requirements
 freeze-requirements:
 	rm -rf venv-freeze
@@ -26,3 +22,21 @@ test-requirements:
 	    && { echo "requirements.txt doesn't match requirements-app.txt."; \
 	         echo "Run 'make freeze-requirements' to update."; exit 1; } \
 	    || { echo "requirements.txt is up to date"; exit 0; }
+
+.PHONY: test
+test: test-requirements test-flake8 test-unit
+
+.PHONY: test-requirements
+test-requirements:
+	@diff requirements-app.txt requirements.txt | grep '<' \
+	    && { echo "requirements.txt doesn't match requirements-app.txt."; \
+	         echo "Run 'make freeze-requirements' to update."; exit 1; } \
+	    || { echo "requirements.txt is up to date"; exit 0; }
+
+.PHONY: test-flake8
+test-flake8: virtualenv
+	${VIRTUALENV_ROOT}/bin/flake8 .
+
+.PHONY: test-unit
+test-unit: virtualenv
+	${VIRTUALENV_ROOT}/bin/py.test ${PYTEST_ARGS}
