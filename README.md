@@ -3,9 +3,10 @@ Digital Marketplace Cloudwatch to Graphite
 
 ## Purpose
 
-Ships Cloudwatch metrics to Hosted Graphite using https://github.com/crccheck/cloudwatch-to-graphite.
+Ships Cloudwatch metrics to Hosted Graphite.
+Based on the work of https://github.com/crccheck/cloudwatch-to-graphite and the `leadbutt` script. Particularly config parsing to define metrics.
 
-An example config file is also included (`config.yaml.example`) to help you define the correct structure for your metrics.
+An example config file is included (`config.yaml.example`) to help you define the correct structure for your metrics.
 
 ## Initial setup
 

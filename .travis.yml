@@ -1,0 +1,11 @@
+language: python
+sudo: false
+python:
+  - "3.6"
+dist: "trusty"
+install:
+  - pip install -r requirements-dev.txt
+script:
+  - make test
+notifications:
+  email: false

@@ -6,6 +6,5 @@
 
 # App requirements
 !app.py
-!pipe-watchdog.py
 !config.yaml
 
