@@ -37,6 +37,12 @@ Metrics:
   Dimensions: {}
   Options:
     Formatter: "cloudwatch.router_429s.{{ environment }}.router.429s.%(statistic)s"
+- Namespace: "DM-SNS"
+  MetricName: "{{ environment }}-dropped-antivirus-sns"
+  Statistics: "Sum"
+  Dimensions: {}
+  Options:
+    Formatter: "cloudwatch.antivirus.sns.{{ environment }}.dropped-sns.%(statistic)s"
 {% endfor -%}
 {% for environment in environments -%}
 {% for app in apps -%}
