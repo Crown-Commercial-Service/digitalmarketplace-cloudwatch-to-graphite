@@ -1,6 +1,8 @@
 Digital Marketplace Cloudwatch to Graphite
 =========================
 
+> As of January 2019 this repo is no longer used by the Digital Marketplace, as we have switched to using Prometheus and alphagov/paas-prometheus-metrics-exporter.
+
 ## Purpose
 
 Ships Cloudwatch metrics to Hosted Graphite.
